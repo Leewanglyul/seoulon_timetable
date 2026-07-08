@@ -1,6 +1,6 @@
 """Vercel Python 서버리스 함수: 관리자 CSV 업로드.
 
-관리자 비밀번호를 확인한 뒤, GitHub Contents API로 data/timetable.csv 파일을
+관리자 비밀번호를 확인한 뒤, GitHub Contents API로 api/_data/timetable.csv 파일을
 저장소에 직접 커밋한다. 저장소가 Vercel과 Git 연동되어 있으므로 커밋이 들어가면
 자동으로 재배포되어 조회 페이지에 새 데이터가 반영된다.
 
@@ -19,7 +19,7 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler
 
 GITHUB_API = "https://api.github.com"
-DATA_PATH = "data/timetable.csv"
+DATA_PATH = "api/_data/timetable.csv"
 
 
 class GithubUpdateError(Exception):

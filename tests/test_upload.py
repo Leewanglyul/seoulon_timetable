@@ -60,7 +60,7 @@ class TestUpload(unittest.TestCase):
         self.assertEqual(mock_urlopen.call_count, 2)
 
         get_req = mock_urlopen.call_args_list[0][0][0]
-        self.assertIn("contents/data/timetable.csv?ref=main", get_req.full_url)
+        self.assertIn("contents/api/_data/timetable.csv?ref=main", get_req.full_url)
         self.assertEqual(get_req.headers.get("Authorization"), "Bearer ghp_faketoken")
 
         put_req = mock_urlopen.call_args_list[1][0][0]

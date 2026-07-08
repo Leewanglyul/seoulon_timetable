@@ -7,11 +7,13 @@ let ALL_RECORDS = [];
 let holidayCache = null; // Map<"YYYY-MM-DD", holidayName>
 let holidayLoadError = null;
 
-async function loadData() {
+async function loadData(idToken) {
   const statusEl = document.getElementById("load-status");
   try {
-    const res = await fetch(`data/timetable.csv?t=${Date.now()}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res = await fetch(`/api/timetable?t=${Date.now()}`, {
+      headers: { Authorization: "Bearer " + idToken },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
     const text = await res.text();
     ALL_RECORDS = parseCsvText(text);
     statusEl.textContent = `총 ${ALL_RECORDS.length}개 수업, ${new Set(ALL_RECORDS.map((r) => r.teacher)).size}명 교사 데이터 로드 완료`;
@@ -90,18 +92,42 @@ const FIELD_CONFIG = {
   classroom: ["cell-room", (r) => r.classroom],
 };
 
-function renderEntryBlock(record, fields) {
+// 여러 명/여러 학교를 비교할 때 항목별로 구분되도록 순환 배정하는 색상 팔레트
+const COMPARE_PALETTE = ["#2b5fa8", "#c0392b", "#1a7a3c", "#b8860b", "#7d3c98", "#008b8b", "#d2691e", "#555555"];
+
+function colorMapFor(names) {
+  const map = {};
+  names.forEach((name, i) => {
+    map[name] = COMPARE_PALETTE[i % COMPARE_PALETTE.length];
+  });
+  return map;
+}
+
+function renderTagRow(names, colorMap, datasetKey) {
+  if (names.length === 0) return "";
+  const chips = names
+    .map(
+      (name) =>
+        `<button type="button" class="tag-chip" style="border-color:${colorMap[name]}" data-remove-${datasetKey}="${escapeHtml(name)}"><span class="tag-dot" style="background:${colorMap[name]}"></span>${escapeHtml(name)}<span class="tag-x">×</span></button>`
+    )
+    .join("");
+  return `<div class="tag-row">${chips}</div>`;
+}
+
+function renderEntryBlock(record, fields, colorMap, colorField) {
   const inner = fields
     .map((f) => {
       const [cls, get] = FIELD_CONFIG[f];
       return `<span class="${cls}">${escapeHtml(get(record))}</span>`;
     })
     .join("");
-  return `<div class="slot-entry">${inner}</div>`;
+  const color = colorMap && colorField ? colorMap[record[colorField]] : null;
+  const style = color ? ` style="border-left:4px solid ${color}"` : "";
+  return `<div class="slot-entry"${style}>${inner}</div>`;
 }
 
 // days/periods: 표시할 순서가 반영된 배열. records: 이미 필터링된 레코드 목록.
-function buildWeekGrid(days, periods, records, fields) {
+function buildWeekGrid(days, periods, records, fields, colorMap, colorField) {
   const byKey = {};
   for (const r of records) {
     const key = `${r.day}-${r.period}`;
@@ -124,7 +150,7 @@ function buildWeekGrid(days, periods, records, fields) {
         html += `<td class="empty-cell"></td>`;
         continue;
       }
-      html += `<td class="filled">${entries.map((r) => renderEntryBlock(r, fields)).join("")}</td>`;
+      html += `<td class="filled">${entries.map((r) => renderEntryBlock(r, fields, colorMap, colorField)).join("")}</td>`;
     }
     html += `</tr>`;
   }
@@ -144,9 +170,11 @@ function renderTeacherView() {
     container.innerHTML = "<p class='empty'>교사를 하나 이상 선택하세요.</p>";
     return;
   }
+  const names = [...selectedTeachers].sort((a, b) => a.localeCompare(b, "ko"));
+  const colorMap = colorMapFor(names);
   const records = ALL_RECORDS.filter((r) => selectedTeachers.has(r.teacher));
-  const { html, total } = buildWeekGrid(ALL_DAYS, ALL_PERIODS, records, ["teacher", "school", "subject", "time", "classroom"]);
-  container.innerHTML = `${html}<p class="summary">선택한 교사: ${[...selectedTeachers].join(", ")} · 총 ${total}개 수업</p>`;
+  const { html, total } = buildWeekGrid(ALL_DAYS, ALL_PERIODS, records, ["teacher", "school", "subject", "time", "classroom"], colorMap, "teacher");
+  container.innerHTML = `${renderTagRow(names, colorMap, "teacher")}${html}<p class="summary">총 ${total}개 수업</p>`;
 }
 
 // ---------- 참여학교로 조회 (여러 학교 비교 가능) ----------
@@ -158,9 +186,11 @@ function renderSchoolView() {
     container.innerHTML = "<p class='empty'>참여 학교를 하나 이상 선택하세요.</p>";
     return;
   }
+  const names = [...selectedSchools].sort((a, b) => a.localeCompare(b, "ko"));
+  const colorMap = colorMapFor(names);
   const records = ALL_RECORDS.filter((r) => selectedSchools.has(r.school));
-  const { html, total } = buildWeekGrid(ALL_DAYS, ALL_PERIODS, records, ["school", "teacher", "subject", "time", "classroom"]);
-  container.innerHTML = `${html}<p class="summary">선택한 학교: ${[...selectedSchools].join(", ")} · 총 ${total}개 수업</p>`;
+  const { html, total } = buildWeekGrid(ALL_DAYS, ALL_PERIODS, records, ["school", "teacher", "subject", "time", "classroom"], colorMap, "school");
+  container.innerHTML = `${renderTagRow(names, colorMap, "school")}${html}<p class="summary">총 ${total}개 수업</p>`;
 }
 
 // ---------- 요일·교시로 조회 (다중 선택 가능) ----------
@@ -270,6 +300,15 @@ function init() {
     document.querySelectorAll("#teacher-buttons button.active").forEach((b) => b.classList.remove("active"));
     renderTeacherView();
   });
+  document.getElementById("teacher-result").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove-teacher]");
+    if (!btn) return;
+    const name = btn.dataset.removeTeacher;
+    selectedTeachers.delete(name);
+    const chip = document.querySelector(`#teacher-buttons button[data-teacher="${CSS.escape(name)}"]`);
+    if (chip) chip.classList.remove("active");
+    renderTeacherView();
+  });
 
   document.getElementById("school-buttons").addEventListener("click", (e) => {
     if (!e.target.matches("button")) return;
@@ -282,10 +321,46 @@ function init() {
     document.querySelectorAll("#school-buttons button.active").forEach((b) => b.classList.remove("active"));
     renderSchoolView();
   });
+  document.getElementById("school-result").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove-school]");
+    if (!btn) return;
+    const name = btn.dataset.removeSchool;
+    selectedSchools.delete(name);
+    const chip = document.querySelector(`#school-buttons button[data-school="${CSS.escape(name)}"]`);
+    if (chip) chip.classList.remove("active");
+    renderSchoolView();
+  });
 
   document.getElementById("date-input").addEventListener("change", (e) => renderDateView(e.target.value));
-
-  loadData();
 }
 
-document.addEventListener("DOMContentLoaded", init);
+async function start() {
+  const statusEl = document.getElementById("load-status");
+  let auth;
+  try {
+    auth = await ensureSignedIn();
+  } catch (err) {
+    statusEl.textContent = "로그인 처리 중 오류가 발생했습니다: " + err.message;
+    statusEl.classList.add("error");
+    return;
+  }
+
+  if (!auth.configured) {
+    statusEl.textContent = "관리자가 아직 로그인 인증을 설정하지 않아 접근할 수 없습니다.";
+    statusEl.classList.add("error");
+    return;
+  }
+
+  const userLabel = auth.account && (auth.account.username || auth.account.name);
+  if (userLabel) statusEl.textContent = `${userLabel}(으)로 로그인됨 · 데이터를 불러오는 중...`;
+
+  const logoutBtn = document.getElementById("logout-btn");
+  logoutBtn.style.display = "";
+  logoutBtn.addEventListener("click", signOut);
+
+  document.getElementById("app-content").style.display = "";
+  init();
+  loadData(auth.idToken);
+}
+
+document.addEventListener("DOMContentLoaded", start);

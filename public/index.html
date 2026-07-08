@@ -9,10 +9,13 @@
 <body>
 <header class="page-header">
   <h1>2학기 공동교육과정 시간표 조회</h1>
-  <p id="load-status" class="status">데이터를 불러오는 중...</p>
+  <div class="filter-row">
+    <p id="load-status" class="status">로그인 확인 중...</p>
+    <button type="button" id="logout-btn" class="reset-btn" style="display:none">로그아웃</button>
+  </div>
 </header>
 
-<main>
+<main id="app-content" style="display:none">
   <nav class="tabs">
     <button class="tab-btn active" data-tab="tab-teacher">교사명으로 조회</button>
     <button class="tab-btn" data-tab="tab-school">참여학교로 조회</button>
@@ -60,6 +63,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/parse.js"></script>
 <script src="js/app.js"></script>
 </body>

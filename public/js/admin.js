@@ -51,6 +51,28 @@ async function handleSubmit() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+async function start() {
+  const statusEl = document.getElementById("load-status");
+  let auth;
+  try {
+    auth = await ensureSignedIn();
+  } catch (err) {
+    statusEl.textContent = "로그인 처리 중 오류가 발생했습니다: " + err.message;
+    statusEl.classList.add("error");
+    return;
+  }
+
+  if (!auth.configured) {
+    statusEl.textContent = "관리자가 아직 로그인 인증을 설정하지 않아 접근할 수 없습니다.";
+    statusEl.classList.add("error");
+    return;
+  }
+
+  const userLabel = auth.account && (auth.account.username || auth.account.name);
+  statusEl.textContent = userLabel ? `${userLabel}(으)로 로그인됨` : "로그인됨";
+
+  document.getElementById("app-content").style.display = "";
   document.getElementById("submit-btn").addEventListener("click", handleSubmit);
-});
+}
+
+document.addEventListener("DOMContentLoaded", start);

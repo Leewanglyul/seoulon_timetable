@@ -112,12 +112,28 @@ thead th { background: var(--bg-soft); }
 .slot-entry {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
+  padding: 4px 0 4px 8px;
 }
-.slot-entry + .slot-entry { border-top: 1px dashed var(--border); }
+.slot-entry + .slot-entry { border-top: 1px dashed var(--border); margin-top: 2px; }
 .slot-entry .cell-teacher { font-weight: 700; font-size: 0.85rem; color: var(--primary); }
 .slot-entry .cell-school { font-weight: 600; }
 .cell-room { font-size: 0.75rem; color: var(--text-muted); }
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.tag-chip:hover { background: var(--bg-soft); }
+.tag-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.tag-x { color: var(--text-muted); font-weight: 700; margin-left: 2px; }
 
 .list-table td, .list-table th { text-align: left; }
 
