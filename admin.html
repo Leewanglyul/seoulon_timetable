@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>관리자 - 시간표 CSV 업로드</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="page-header">
+  <h1>시간표 데이터 업로드</h1>
+  <p class="status">새 학기 CSV를 업로드하면 잠시 후 조회 페이지에 자동 반영됩니다.</p>
+</header>
+
+<main>
+  <label for="password">관리자 비밀번호</label>
+  <input type="password" id="password" autocomplete="current-password" />
+
+  <label for="csv-file">CSV 파일 선택</label>
+  <input type="file" id="csv-file" accept=".csv" />
+
+  <p><button id="submit-btn" class="tab-btn" style="margin-top:16px;">업로드</button></p>
+
+  <div id="result" class="result-area"></div>
+</main>
+
+<footer class="page-footer">
+  <a href="index.html">조회 페이지로 돌아가기</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="js/parse.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

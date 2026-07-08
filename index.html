@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>공동교육과정 시간표 조회</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<header class="page-header">
+  <h1>2학기 공동교육과정 시간표 조회</h1>
+  <p id="load-status" class="status">데이터를 불러오는 중...</p>
+</header>
+
+<main>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="tab-teacher">교사명으로 조회</button>
+    <button class="tab-btn" data-tab="tab-school">파견학교로 조회</button>
+    <button class="tab-btn" data-tab="tab-slot">요일·교시로 조회</button>
+  </nav>
+
+  <section id="tab-teacher" class="tab-panel active">
+    <label for="teacher-select">교사 선택</label>
+    <select id="teacher-select"><option value="">불러오는 중...</option></select>
+    <div id="teacher-result" class="result-area"></div>
+  </section>
+
+  <section id="tab-school" class="tab-panel">
+    <label for="school-select">파견 학교 선택</label>
+    <select id="school-select"><option value="">불러오는 중...</option></select>
+    <div id="school-result" class="result-area"></div>
+  </section>
+
+  <section id="tab-slot" class="tab-panel">
+    <label>요일 선택</label>
+    <div id="day-buttons" class="chip-group"></div>
+    <label>교시 선택</label>
+    <div id="period-buttons" class="chip-group"></div>
+    <div id="slot-result" class="result-area"></div>
+  </section>
+</main>
+
+<footer class="page-footer">
+  <a href="admin.html">관리자 페이지</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="js/parse.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
