@@ -115,9 +115,9 @@ function renderSchoolView(school) {
   container.innerHTML = html;
 }
 
-// ---------- 요일·교시로 조회 ----------
-let selectedDay = null;
-let selectedPeriod = null;
+// ---------- 요일·교시로 조회 (다중 선택 가능) ----------
+const selectedDays = new Set();
+const selectedPeriods = new Set();
 
 function initSlotButtons() {
   const dayWrap = document.getElementById("day-buttons");
@@ -131,39 +131,74 @@ function initSlotButtons() {
 
   dayWrap.addEventListener("click", (e) => {
     if (!e.target.matches("button")) return;
-    dayWrap.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
-    e.target.classList.add("active");
-    selectedDay = e.target.dataset.day;
+    const day = e.target.dataset.day;
+    if (selectedDays.has(day)) {
+      selectedDays.delete(day);
+      e.target.classList.remove("active");
+    } else {
+      selectedDays.add(day);
+      e.target.classList.add("active");
+    }
     renderSlotView();
   });
   periodWrap.addEventListener("click", (e) => {
     if (!e.target.matches("button")) return;
-    periodWrap.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
-    e.target.classList.add("active");
-    selectedPeriod = Number(e.target.dataset.period);
+    const period = Number(e.target.dataset.period);
+    if (selectedPeriods.has(period)) {
+      selectedPeriods.delete(period);
+      e.target.classList.remove("active");
+    } else {
+      selectedPeriods.add(period);
+      e.target.classList.add("active");
+    }
     renderSlotView();
   });
 }
 
 function renderSlotView() {
   const container = document.getElementById("slot-result");
-  if (!selectedDay || !selectedPeriod) {
-    container.innerHTML = "";
+  const days = Object.keys(DAY_ORDER).filter((d) => selectedDays.has(d));
+  const periods = [1, 2, 3, 4, 5, 6, 7].filter((p) => selectedPeriods.has(p));
+
+  if (days.length === 0 || periods.length === 0) {
+    container.innerHTML = "<p class='empty'>요일과 교시를 하나 이상 선택하세요.</p>";
     return;
   }
-  const records = ALL_RECORDS.filter((r) => r.day === selectedDay && r.period === selectedPeriod).sort((a, b) =>
-    a.teacher.localeCompare(b.teacher, "ko")
-  );
-  if (records.length === 0) {
-    container.innerHTML = "<p class='empty'>해당 시간에 진행되는 수업이 없습니다.</p>";
-    return;
+
+  const byKey = {};
+  for (const r of ALL_RECORDS) {
+    const key = `${r.day}-${r.period}`;
+    (byKey[key] = byKey[key] || []).push(r);
   }
-  let html = `<table class="list-table"><thead><tr><th>교사</th><th>강의실</th><th>파견학교</th><th>과목</th><th>시간</th></tr></thead><tbody>`;
-  for (const r of records) {
-    html += `<tr><td>${escapeHtml(r.teacher)}</td><td>${escapeHtml(r.classroom)}</td><td>${escapeHtml(r.school)}</td><td>${escapeHtml(r.subject)}</td><td>${escapeHtml(r.time)}</td></tr>`;
+  for (const key in byKey) {
+    byKey[key].sort((a, b) => a.teacher.localeCompare(b.teacher, "ko"));
+  }
+
+  let total = 0;
+  let html = `<table class="grid-table"><thead><tr><th>교시</th>`;
+  for (const d of days) html += `<th>${d}</th>`;
+  html += `</tr></thead><tbody>`;
+  for (const p of periods) {
+    html += `<tr><th>${p}교시</th>`;
+    for (const d of days) {
+      const entries = byKey[`${d}-${p}`] || [];
+      total += entries.length;
+      if (entries.length === 0) {
+        html += `<td class="empty-cell"></td>`;
+        continue;
+      }
+      const entryHtml = entries
+        .map(
+          (r) =>
+            `<div class="slot-entry"><span class="cell-teacher">${escapeHtml(r.teacher)}</span><span class="cell-school">${escapeHtml(r.school)}</span><span class="cell-subject">${escapeHtml(r.subject)}</span><span class="cell-time">${escapeHtml(r.time)}</span></div>`
+        )
+        .join("");
+      html += `<td class="filled">${entryHtml}</td>`;
+    }
+    html += `</tr>`;
   }
   html += `</tbody></table>`;
-  html += `<p class="summary">${selectedDay}요일 ${selectedPeriod}교시 · 총 ${records.length}개 수업</p>`;
+  html += `<p class="summary">${days.join(", ")}요일 · ${periods.join(", ")}교시 · 총 ${total}개 수업</p>`;
   container.innerHTML = html;
 }
 

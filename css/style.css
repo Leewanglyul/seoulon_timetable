@@ -83,11 +83,20 @@ th, td {
 }
 thead th { background: var(--bg-soft); }
 
-.grid-table td.filled { background: #eef4fc; text-align: left; }
+.grid-table td.filled { background: #eef4fc; text-align: left; vertical-align: top; }
 .grid-table td.empty-cell { background: #fff; }
 .cell-school { font-weight: 700; font-size: 0.85rem; }
 .cell-subject { font-size: 0.85rem; color: #2c3e50; }
 .cell-time { font-size: 0.78rem; color: var(--text-muted); }
+
+.slot-entry {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+.slot-entry + .slot-entry { border-top: 1px dashed var(--border); }
+.slot-entry .cell-teacher { font-weight: 700; font-size: 0.85rem; color: var(--primary); }
+.slot-entry .cell-school { font-weight: 600; }
 .cell-room { font-size: 0.75rem; color: var(--text-muted); }
 
 .list-table td, .list-table th { text-align: left; }
