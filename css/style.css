@@ -52,7 +52,27 @@ main { max-width: 900px; margin: 0 auto; padding: 20px; }
 
 label { display: block; font-weight: 600; margin: 12px 0 6px; }
 
-select, input[type="text"], input[type="password"], input[type="file"] {
+.filter-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.filter-row label { margin: 12px 0 6px; }
+.reset-btn {
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.reset-btn:hover { text-decoration: underline; }
+
+.chip-group.scrollable {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+select, input[type="text"], input[type="password"], input[type="file"], input[type="date"] {
   width: 100%;
   max-width: 420px;
   padding: 10px 12px;

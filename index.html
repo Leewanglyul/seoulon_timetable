@@ -17,26 +17,41 @@
     <button class="tab-btn active" data-tab="tab-teacher">교사명으로 조회</button>
     <button class="tab-btn" data-tab="tab-school">참여학교로 조회</button>
     <button class="tab-btn" data-tab="tab-slot">요일·교시로 조회</button>
+    <button class="tab-btn" data-tab="tab-date">날짜로 조회</button>
   </nav>
 
   <section id="tab-teacher" class="tab-panel active">
-    <label for="teacher-select">교사 선택</label>
-    <select id="teacher-select"><option value="">불러오는 중...</option></select>
+    <div class="filter-row">
+      <label for="teacher-filter">교사 선택 (여러 명 선택 가능)</label>
+      <button type="button" class="reset-btn" id="teacher-reset">선택 해제</button>
+    </div>
+    <input type="text" id="teacher-filter" placeholder="이름 검색" />
+    <div id="teacher-buttons" class="chip-group scrollable">불러오는 중...</div>
     <div id="teacher-result" class="result-area"></div>
   </section>
 
   <section id="tab-school" class="tab-panel">
-    <label for="school-select">참여 학교 선택</label>
-    <select id="school-select"><option value="">불러오는 중...</option></select>
+    <div class="filter-row">
+      <label for="school-filter">참여 학교 선택 (여러 곳 선택 가능)</label>
+      <button type="button" class="reset-btn" id="school-reset">선택 해제</button>
+    </div>
+    <input type="text" id="school-filter" placeholder="학교명 검색" />
+    <div id="school-buttons" class="chip-group scrollable">불러오는 중...</div>
     <div id="school-result" class="result-area"></div>
   </section>
 
   <section id="tab-slot" class="tab-panel">
-    <label>요일 선택</label>
+    <label>요일 선택 (여러 개 선택 가능)</label>
     <div id="day-buttons" class="chip-group"></div>
-    <label>교시 선택</label>
+    <label>교시 선택 (여러 개 선택 가능)</label>
     <div id="period-buttons" class="chip-group"></div>
     <div id="slot-result" class="result-area"></div>
+  </section>
+
+  <section id="tab-date" class="tab-panel">
+    <label for="date-input">날짜 선택 (2학기: 2026-08-13 ~ 2027-02-05)</label>
+    <input type="date" id="date-input" min="2026-08-13" max="2027-02-05" />
+    <div id="date-result" class="result-area"></div>
   </section>
 </main>
 
