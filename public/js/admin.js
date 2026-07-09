@@ -53,9 +53,10 @@ async function handleSubmit() {
 
 async function start() {
   const statusEl = document.getElementById("load-status");
+  const loginGate = document.getElementById("login-gate");
   let auth;
   try {
-    auth = await ensureSignedIn();
+    auth = await checkAuthStatus();
   } catch (err) {
     statusEl.textContent = "로그인 처리 중 오류가 발생했습니다: " + err.message;
     statusEl.classList.add("error");
@@ -65,6 +66,13 @@ async function start() {
   if (!auth.configured) {
     statusEl.textContent = "관리자가 아직 로그인 인증을 설정하지 않아 접근할 수 없습니다.";
     statusEl.classList.add("error");
+    return;
+  }
+
+  if (!auth.signedIn) {
+    statusEl.textContent = "로그인이 필요합니다.";
+    loginGate.style.display = "";
+    document.getElementById("login-btn").addEventListener("click", triggerLogin);
     return;
   }
 

@@ -45,21 +45,24 @@ async function initMsal() {
   return msalInstance;
 }
 
-// 로그인 여부를 확인한다. 설정이 안 되어 있으면 { configured: false } 를 반환하고,
-// 로그인이 안 되어 있으면 Microsoft 로그인 화면으로 리디렉션한다 (이 함수는 반환되지 않음).
-// 로그인이 되어 있으면 { configured: true, idToken, account } 를 반환한다.
-async function ensureSignedIn() {
+// 로그인 상태만 확인한다 (미로그인이어도 리디렉션하지 않음).
+// 반환값: { configured, signedIn, idToken?, account? }
+async function checkAuthStatus() {
   const instance = await initMsal();
-  if (!instance) return { configured: false };
+  if (!instance) return { configured: false, signedIn: false };
 
-  let account = instance.getAllAccounts()[0];
-  if (!account) {
-    await instance.loginRedirect({ scopes: ["openid", "profile"] });
-    return new Promise(() => {}); // 리디렉션 진행 중 — 페이지가 곧 이동함
-  }
+  const account = instance.getAllAccounts()[0];
+  if (!account) return { configured: true, signedIn: false };
 
   const result = await instance.acquireTokenSilent({ account, scopes: ["openid", "profile"] });
-  return { configured: true, idToken: result.idToken, account };
+  return { configured: true, signedIn: true, idToken: result.idToken, account };
+}
+
+// 로그인 버튼 클릭 시 호출 — Microsoft 로그인 화면으로 이동한다.
+async function triggerLogin() {
+  const instance = await initMsal();
+  if (!instance) return;
+  await instance.loginRedirect({ scopes: ["openid", "profile"] });
 }
 
 function signOut() {
