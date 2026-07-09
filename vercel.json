@@ -1,3 +1,8 @@
 {
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "functions": {
+    "api/timetable.py": {
+      "includeFiles": "api/{_auth.py,_data/**}"
+    }
+  }
 }
