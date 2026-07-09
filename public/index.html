@@ -3,19 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>공동교육과정 시간표 조회</title>
+<title>서울온라인학교 시간표 조회 시스템</title>
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 <header class="page-header">
-  <h1>2학기 공동교육과정 시간표 조회</h1>
-  <div class="filter-row">
-    <p id="load-status" class="status">로그인 확인 중...</p>
-    <button type="button" id="logout-btn" class="reset-btn" style="display:none">로그아웃</button>
+  <img src="assets/logo.png" alt="서울온라인학교" class="logo-mark" />
+  <div class="header-text">
+    <h1>서울온라인학교 시간표 조회 시스템</h1>
+    <div class="filter-row">
+      <p id="load-status" class="status">로그인 확인 중...</p>
+      <button type="button" id="logout-btn" class="reset-btn" style="display:none">로그아웃</button>
+    </div>
   </div>
 </header>
 
-<div id="login-gate" class="login-gate" style="display:none">
+<div id="login-gate" class="login-gate with-hero" style="display:none">
+  <img src="assets/logo.png" alt="서울온라인학교" class="login-logo" />
   <p>학교 조직의 Microsoft 계정으로 로그인해야 시간표를 조회할 수 있습니다.</p>
   <button type="button" id="login-btn" class="tab-btn">Microsoft 계정으로 로그인</button>
 </div>

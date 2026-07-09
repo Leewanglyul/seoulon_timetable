@@ -161,6 +161,41 @@ function buildWeekGrid(days, periods, records, fields, colorMap, colorField) {
 const ALL_DAYS = Object.keys(DAY_ORDER);
 const ALL_PERIODS = [1, 2, 3, 4, 5, 6, 7];
 
+// ---------- 스프레드시트(CSV) 다운로드 ----------
+const lastRecordsByView = {};
+
+function csvField(v) {
+  return '"' + String(v ?? "").replace(/"/g, '""') + '"';
+}
+
+function recordsToCsv(records) {
+  const header = ["요일", "교시", "교사", "참여학교", "과목", "시간", "강의실"];
+  const lines = [header.map(csvField).join(",")];
+  for (const r of records) {
+    lines.push([r.day, `${r.period}교시`, r.teacher, r.school, r.subject, r.time, r.classroom].map(csvField).join(","));
+  }
+  return lines.join("\r\n");
+}
+
+function downloadCsv(filenamePrefix, records) {
+  if (!records || records.length === 0) return;
+  const csv = "﻿" + recordsToCsv(records); // BOM 포함 -- 엑셀에서 한글 깨짐 방지
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const ts = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `${filenamePrefix}_${ts}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadButtonHtml(viewKey) {
+  return `<button type="button" class="reset-btn download-btn" data-download="${viewKey}">스프레드시트로 다운로드</button>`;
+}
+
 // ---------- 교사명으로 조회 (여러 명 비교 가능) ----------
 const selectedTeachers = new Set();
 
@@ -173,8 +208,9 @@ function renderTeacherView() {
   const names = [...selectedTeachers].sort((a, b) => a.localeCompare(b, "ko"));
   const colorMap = colorMapFor(names);
   const records = ALL_RECORDS.filter((r) => selectedTeachers.has(r.teacher));
+  lastRecordsByView.teacher = records;
   const { html, total } = buildWeekGrid(ALL_DAYS, ALL_PERIODS, records, ["teacher", "school", "subject", "time", "classroom"], colorMap, "teacher");
-  container.innerHTML = `${renderTagRow(names, colorMap, "teacher")}${html}<p class="summary">총 ${total}개 수업</p>`;
+  container.innerHTML = `${renderTagRow(names, colorMap, "teacher")}${html}<p class="summary">총 ${total}개 수업</p>${downloadButtonHtml("teacher")}`;
 }
 
 // ---------- 참여학교로 조회 (여러 학교 비교 가능) ----------
@@ -189,8 +225,9 @@ function renderSchoolView() {
   const names = [...selectedSchools].sort((a, b) => a.localeCompare(b, "ko"));
   const colorMap = colorMapFor(names);
   const records = ALL_RECORDS.filter((r) => selectedSchools.has(r.school));
+  lastRecordsByView.school = records;
   const { html, total } = buildWeekGrid(ALL_DAYS, ALL_PERIODS, records, ["school", "teacher", "subject", "time", "classroom"], colorMap, "school");
-  container.innerHTML = `${renderTagRow(names, colorMap, "school")}${html}<p class="summary">총 ${total}개 수업</p>`;
+  container.innerHTML = `${renderTagRow(names, colorMap, "school")}${html}<p class="summary">총 ${total}개 수업</p>${downloadButtonHtml("school")}`;
 }
 
 // ---------- 요일·교시로 조회 (다중 선택 가능) ----------
@@ -225,7 +262,8 @@ function renderSlotView() {
     return;
   }
   const { html, total } = buildWeekGrid(days, periods, ALL_RECORDS, ["teacher", "school", "subject", "time", "classroom"]);
-  container.innerHTML = `${html}<p class="summary">${days.join(", ")}요일 · ${periods.join(", ")}교시 · 총 ${total}개 수업</p>`;
+  lastRecordsByView.slot = ALL_RECORDS.filter((r) => days.includes(r.day) && periods.includes(r.period));
+  container.innerHTML = `${html}<p class="summary">${days.join(", ")}요일 · ${periods.join(", ")}교시 · 총 ${total}개 수업</p>${downloadButtonHtml("slot")}`;
 }
 
 // ---------- 날짜로 조회 (공휴일 반영) ----------
@@ -282,6 +320,8 @@ async function renderDateView(dateStr) {
   }
   html += `</tbody></table>`;
   html += `<p class="summary">${dateStr} (${weekdayLabel}요일) 기준 정규 시간표 · 총 ${records.length}개 수업 · 시험 기간 등 실제 학사일정에 따라 달라질 수 있습니다.</p>`;
+  lastRecordsByView.date = records;
+  html += downloadButtonHtml("date");
   container.innerHTML = noteHtml + html;
 }
 
@@ -332,6 +372,13 @@ function init() {
   });
 
   document.getElementById("date-input").addEventListener("change", (e) => renderDateView(e.target.value));
+
+  document.getElementById("app-content").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-download]");
+    if (!btn) return;
+    const key = btn.dataset.download;
+    downloadCsv(`시간표_${key}`, lastRecordsByView[key]);
+  });
 }
 
 async function start() {

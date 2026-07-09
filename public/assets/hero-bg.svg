@@ -1,0 +1,12 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <rect width="1600" height="900" fill="#ffffff" />
+
+  <!-- top-left teal wave -->
+  <path d="M0,0 L420,0 C300,90 250,150 320,230 C230,190 90,150 0,190 Z" fill="#00ada0" opacity="0.55" />
+  <path d="M0,0 L300,0 C210,70 180,120 230,180 C150,150 60,120 0,150 Z" fill="#00ada0" />
+
+  <!-- bottom purple waves -->
+  <path d="M0,760 C300,700 480,830 760,780 C1040,730 1260,650 1600,720 L1600,900 L0,900 Z" fill="#601986" opacity="0.28" />
+  <path d="M0,820 C260,770 520,880 820,830 C1120,780 1340,730 1600,800 L1600,900 L0,900 Z" fill="#601986" opacity="0.55" />
+  <path d="M0,870 C320,830 620,900 900,860 C1180,820 1360,800 1600,850 L1600,900 L0,900 Z" fill="#601986" />
+</svg>

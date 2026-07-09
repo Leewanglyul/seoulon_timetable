@@ -1,5 +1,6 @@
 :root {
-  --primary: #2b5fa8;
+  --primary: #601986;
+  --brand-teal: #00ada0;
   --border: #dfe3e8;
   --bg-soft: #f6f8fa;
   --text-muted: #6b7280;
@@ -18,22 +19,39 @@ body {
 }
 
 .page-header {
-  padding: 24px 20px 12px;
+  padding: 20px 20px 12px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
-.page-header h1 { margin: 0 0 6px; font-size: 1.4rem; }
+.page-header .logo-mark { height: 28px; width: auto; flex-shrink: 0; }
+.page-header .header-text { flex: 1; min-width: 0; }
+.page-header h1 { margin: 0 0 6px; font-size: 1.3rem; }
 .status { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
 .status.error { color: #c0392b; }
 
 main { max-width: 900px; margin: 0 auto; padding: 20px; }
 
 .login-gate {
-  max-width: 900px;
-  margin: 60px auto;
-  padding: 40px 20px;
+  max-width: none;
+  min-height: calc(100vh - 80px);
+  margin: 0;
+  padding: 60px 20px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-.login-gate p { color: var(--text-muted); margin-bottom: 20px; }
+.login-gate.with-hero {
+  background-image: url("../assets/hero-bg.svg");
+  background-size: cover;
+  background-position: center;
+}
+.login-gate .login-logo { width: min(360px, 80vw); height: auto; margin-bottom: 28px; }
+.login-gate p { color: var(--text-muted); margin-bottom: 20px; font-size: 1.05rem; }
+.login-gate .tab-btn { padding: 12px 28px; font-size: 1rem; }
 
 .tabs {
   display: flex;
@@ -147,6 +165,20 @@ thead th { background: var(--bg-soft); }
 
 .summary { color: var(--text-muted); font-size: 0.85rem; margin-top: 10px; }
 .empty { color: var(--text-muted); }
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--brand-teal);
+  border-radius: 8px;
+  color: var(--brand-teal);
+  font-weight: 600;
+}
+.download-btn:hover { background: var(--bg-soft); }
+.download-btn::before { content: "⬇"; }
 
 .page-footer {
   text-align: center;
