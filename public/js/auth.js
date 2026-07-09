@@ -1,4 +1,4 @@
-const MSAL_SDK_URL = "https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js";
+const MSAL_SDK_URL = "https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js";
 
 let msalInstance = null;
 let authConfigPromise = null;
