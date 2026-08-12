@@ -131,3 +131,5 @@ CSV 형식은 기존 파일(`api/_data/timetable.csv`)과 동일한 구조(강�
 `SEMESTER_START`, `SEMESTER_END` 상수와 [api/holidays.py](api/holidays.py)의 `YEARS`
 목록(공휴일을 조회할 연도)도 함께 수정해서 커밋해야 "날짜로 조회" 탭이 새 학기 기간에
 맞게 동작합니다.
+
+ <!-- redeploy -->
